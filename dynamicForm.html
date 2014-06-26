@@ -1,0 +1,113 @@
+<!-- template.html -->
+<html>
+  <head>
+    <title>Hello React</title>
+    <script src="http://fb.me/react-0.10.0.js"></script>
+    <script src="http://fb.me/JSXTransformer-0.10.0.js"></script>
+    <script src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/showdown/0.3.1/showdown.min.js"></script>
+  </head>
+  <body>
+    <div id="content"></div>
+    <script type="text/jsx">
+		/**
+		* @jsx React.DOM
+		*/
+
+    var myForm = React.createClass({
+      getInitialState: function(){
+        return {data: [], };
+      },
+      componentWillMount: function(){
+        $.ajax({
+          url: this.props.url,
+          dataType: "json",
+          success: function(data) {
+            this.setState({data: data});
+          }.bind(this),
+          error: function(xhr, status, err){
+            console.error(this.props.url, status, err.toString());
+          }.bind(this)
+        });
+      },
+      render: function() {
+        if(this.state.data["id"]){
+          return (
+            <div className="myForm">
+              <h1> {this.state.data["id"]} </h1>
+              <fieldList data={this.state.data["fields"]} />
+            </div>
+          );
+        } 
+        else{
+          return ( <div className="myForm"></div> )
+        }
+      }
+    });
+
+    function getField(key, value){
+      if(typeof value == "boolean"){
+        return (<li><checkField tag={key} checked={value}/></li>)
+      }
+      else if (typeof value == "object") {
+        return (<li>{key}<fieldList data={value} /></li>)
+      }
+      else {
+        return (<li><textField tag={key} text={value} /></li>)
+      }
+    }
+
+    var fieldList = React.createClass({
+      render: function() {
+        var fields = [];
+        if(typeof this.props.data[0] == "undefined"){ //object is json, not list
+          for(var key in this.props.data){
+            var value = this.props.data[key]
+            fields.push(getField(key, value))
+          }
+        }
+        else{ //object is list, not json
+          for(var i = 0; i < this.props.data.length; i++){
+            var key = Object.keys(this.props.data[i])[0]
+            var value = this.props.data[i][key]
+            fields.push(getField(key, value)) 
+          }
+        }
+        return ( 
+          <div className="fieldList">
+            <ul>
+              {fields}
+            </ul>
+          </div>
+        );
+      }
+    });
+
+    var textField = React.createClass({
+      render: function() {
+        return (
+          <div className="textField">
+            {this.props.tag} <input type="text" defaultValue={this.props.text} />
+          </div>
+        );
+      }
+    });
+
+    var checkField = React.createClass({
+      render: function() {
+        return (
+          <div className="checkField">
+            {this.props.tag} <input type="checkbox" defaultChecked={this.props.checked}/>
+          </div>
+        );
+      }
+    });
+
+    React.renderComponent(
+      <myForm url="form.json" />,
+      document.getElementById('content')
+    );
+
+    </script>
+  </body>
+</html>
