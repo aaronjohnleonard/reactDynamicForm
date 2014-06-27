@@ -8,7 +8,10 @@ This page looks for a json file that is located in the same directory. The json 
 {
   "id":*number*,
   "fields: [
-    {*field*}
+    {*field*,
+     *field*,
+        ...  
+    }
   ]
 }
 
