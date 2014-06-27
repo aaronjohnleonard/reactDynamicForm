@@ -6,9 +6,9 @@ An HTML form that is created dynamically from a json file
 This page looks for a json file that is located in the same directory. The json file must have a similar format to this:
 
 {
-  "id":<number>,
+  "id":*number*,
   "fields: [
-    {<field>}
+    {*field*}
   ]
 }
 
